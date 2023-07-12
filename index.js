@@ -10,6 +10,8 @@ const performCronJob5 = require("./cronJobs/5minute");
 const performCronJob10 = require("./cronJobs/10minute");
 const performCronJob30 = require("./cronJobs/30minute");
 const performCronJob60 = require("./cronJobs/60minute");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 // Routes imports
 const userRoute = require("./routes/user");
@@ -24,6 +26,23 @@ async function startServer() {
     });
 
     console.log("DB connected successfully");
+
+    // Define Swagger options
+    const swaggerOptions = {
+      definition: {
+        openapi: "3.0.0",
+        info: {
+          title: "Your API Title",
+          version: "1.0.0",
+          description: "API documentation for your Express server",
+        },
+      },
+      apis: ["./routes/*.js"], // Replace with the path to your route files
+    };
+
+    // Generate Swagger specification
+    const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
 
     // Initialize Agenda
     const agenda1 = new Agenda({ mongo: mongoose.connection });
@@ -67,13 +86,6 @@ async function startServer() {
     await agenda30.start();
     await agenda60.start();
 
-    // Schedule the cron jobs
-    agenda1.every("*/1 * * * *", "performCronJob1");
-    agenda5.every("*/5 * * * *", "performCronJob5");
-    agenda10.every("*/10 * * * *", "performCronJob10");
-    agenda30.every("*/30 * * * *", "performCronJob30");
-    agenda60.every("0 * * * *", "performCronJob60");
-
     // Middleware
     app.use(express.json());
     app.use(helmet());
@@ -83,6 +95,9 @@ async function startServer() {
     // Initializing routes
     app.use("/api/user", userRoute);
     app.use("/api/monitor", monitorRoute);
+
+    // Swagger UI
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     // Start the server
     app.listen(5000, () => {

@@ -5,6 +5,43 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: User
+ *   description: API endpoints for managing users
+ */
+
+/**
+ * @swagger
+ * /api/user/register:
+ *   post:
+ *     summary: User registration
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               timezone:
+ *                 type: string
+ *               marketingEmailsOptIn:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       409:
+ *         description: Email already exists
+ *       500:
+ *         description: An internal server error occurred
+ */
+
 // User registration
 router.post("/register", async (req, res) => {
   try {
@@ -37,6 +74,40 @@ router.post("/register", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/user/login:
+ *   post:
+ *     summary: User login
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *       401:
+ *         description: Invalid email or password
+ *       500:
+ *         description: An internal server error occurred
+ */
 // User login
 router.post("/login", async (req, res) => {
   try {

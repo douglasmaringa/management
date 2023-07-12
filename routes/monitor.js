@@ -4,6 +4,45 @@ const Monitor = require("../models/Monitor");
 const UptimeEvent = require("../models/UptimeEvent");
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Monitor
+ *   description: API endpoints for managing monitors
+ */
+
+/**
+ * @swagger
+ * /api/monitor/monitors:
+ *   post:
+ *     summary: Create a new monitor
+ *     tags: [Monitor]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *               port:
+ *                 type: number
+ *               frequency:
+ *                 type: number
+ *               token:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Monitor created successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: An internal server error occurred
+ */
+
 // Create a new monitor
 router.post("/monitors", verifyToken, async (req, res) => {
   try {
@@ -31,30 +70,54 @@ router.post("/monitors", verifyToken, async (req, res) => {
   }
 });
 
-// Delete a monitor
-router.delete("/monitors/:id", verifyToken, async (req, res) => {
-  try {
-    const monitorId = req.params.id;
 
-    // Extract user ID from the token
-    const userId = req.user.userId;
-
-    // Find the monitor and ensure it belongs to the user
-    const monitor = await Monitor.findOne({ _id: monitorId, user: userId });
-    if (!monitor) {
-      return res.status(404).json({ error: "Monitor not found" });
-    }
-
-    // Delete the monitor
-    await monitor.remove();
-
-    res.status(200).json({ message: "Monitor deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting monitor:", error);
-    res.status(500).json({ error: "An internal server error occurred" });
-  }
-});
-
+/**
+ * @swagger
+ * /api/monitor/monitors/all:
+ *   post:
+ *     summary: Fetch all monitors for the user
+ *     tags: [Monitor]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Monitors fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 monitors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       user:
+ *                         type: string
+ *                       url:
+ *                         type: string
+ *                       isPaused:
+ *                         type: boolean
+ *                       port:
+ *                         type: number
+ *                       frequency:
+ *                         type: number
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: An internal server error occurred
+ */
 // Fetch all monitors for the user
 router.post("/monitors/all", verifyToken, async (req, res) => {
   try {
@@ -71,6 +134,59 @@ router.post("/monitors/all", verifyToken, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/monitor/monitors/uptimeevents:
+ *   post:
+ *     summary: Fetch all uptime events for a monitor, sorted by latest
+ *     tags: [Monitor]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Uptime events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Url:
+ *                   type: string
+ *                 frequency:
+ *                   type: number
+ *                 port:
+ *                   type: number
+ *                 uptimeEvents:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       monitor:
+ *                         type: string
+ *                       timestamp:
+ *                         type: string
+ *                       isUp:
+ *                         type: boolean
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Monitor not found
+ *       500:
+ *         description: An internal server error occurred
+ */
 // Fetch all uptime events for a monitor, sorted by latest
 router.post("/monitors/uptimeevents", verifyToken, async (req, res) => {
   try {
