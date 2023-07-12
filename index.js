@@ -86,6 +86,13 @@ async function startServer() {
     await agenda30.start();
     await agenda60.start();
 
+    // Schedule the cron jobs
+    agenda1.every("*/1 * * * *", "performCronJob1");
+    agenda5.every("*/5 * * * *", "performCronJob5");
+    agenda10.every("*/10 * * * *", "performCronJob10");
+    agenda30.every("*/30 * * * *", "performCronJob30");
+    agenda60.every("0 * * * *", "performCronJob60");
+
     // Middleware
     app.use(express.json());
     app.use(helmet());
@@ -100,8 +107,8 @@ async function startServer() {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     // Start the server
-    app.listen(5000, () => {
-      console.log("Server running on port 5000");
+    app.listen(8080, () => {
+      console.log("Server running on port 8080");
     });
   } catch (error) {
     console.error("Error starting the server:", error);

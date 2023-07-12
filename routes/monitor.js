@@ -214,6 +214,59 @@ router.post("/monitors/uptimeevents", verifyToken, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/monitor/monitors/{id}/pause:
+ *   put:
+ *     summary: Update a monitor and set isPaused to true
+ *     tags: [Monitor]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the monitor to be updated
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Monitor paused successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       404:
+ *         description: Monitor not found
+ *       500:
+ *         description: An internal server error occurred
+ */
+
+
+// Update a monitor and set isPaused to true
+router.put("/monitors/:id/pause", async (req, res) => {
+  try {
+    const monitorId = req.params.id;
+    // Find the monitor and ensure it belongs to the user
+    const monitor = await Monitor.findOne({ _id: monitorId });
+    if (!monitor) {
+      return res.status(404).json({ error: "Monitor not found" });
+    }
+
+    // Update the monitor and set isPaused to true
+    monitor.isPaused = true;
+    await monitor.save();
+
+    res.status(200).json({ message: "Monitor paused successfully" });
+  } catch (error) {
+    console.error("Error pausing monitor:", error);
+    res.status(500).json({ error: "An internal server error occurred" });
+  }
+});
+
+
 // Middleware function to verify the JWT token
 function verifyToken(req, res, next) {
     const token = req.body.token;
