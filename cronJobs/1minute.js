@@ -33,7 +33,8 @@ const performCronJob1 = async () => {
     while (hasMoreMonitors) {
       monitors = await Monitor.find({
         frequency: 1,
-        updatedAt: { $lte: new Date(Date.now() - 45 * 1000) }
+        updatedAt: { $lte: new Date(Date.now() - 45 * 1000) },
+        isPaused: false
       });
       
       
@@ -170,3 +171,4 @@ const performCronJob1 = async () => {
 };
 
 module.exports = performCronJob1;
+

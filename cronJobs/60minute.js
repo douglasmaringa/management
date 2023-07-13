@@ -33,7 +33,8 @@ const performCronJob60 = async () => {
     while (hasMoreMonitors) {
       monitors = await Monitor.find({
         frequency: 60,
-        updatedAt: { $lte: new Date(Date.now() - 58 * 60 * 1000) }
+        updatedAt: { $lte: new Date(Date.now() - 58 * 60 * 1000) },
+        isPaused: false
       });
       
       
